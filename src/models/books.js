@@ -5,7 +5,7 @@ const bookSchema = new mongoose.Schema({
   author: String,
   language: String,
   year: String,
-  publisher: { type: mongoose.Schema.Types.ObjectId, ref: "Publisher" },
+  publisher_id: { type: mongoose.Schema.Types.ObjectId, ref: "Publisher" },
 });
 
 const Book = mongoose.model("Book", bookSchema);

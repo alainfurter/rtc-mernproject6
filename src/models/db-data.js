@@ -1,7 +1,7 @@
 const { Book } = require("./books");
 const { Publisher } = require("./publishers");
 
-let publishers = [
+let publishers_list = [
   {
     name: "Simon and Schuster",
     books: [0, 1],
@@ -16,7 +16,7 @@ let publishers = [
   },
 ];
 
-let books = [
+let books_list = [
   {
     id: 0,
     title: "Sword Fiction",
@@ -63,12 +63,14 @@ const clearAndInsertData = async () => {
   try {
     // Create publishers
     await Publisher.collection.drop();
-    const publishers = await Publisher.create(publishers);
+    await Book.collection.drop();
+
+    const publishers = await Publisher.create(publishers_list);
 
     // Create books
-    await Book.collection.drop();
+
     const books = await Book.create(
-      books.map((book) => ({
+      books_list.map((book) => ({
         title: book.title,
         author: book.author,
         language: book.language,
@@ -78,37 +80,37 @@ const clearAndInsertData = async () => {
     );
 
     // load book data into publisher docs
-    for (let i = 0; i < publishers.length; i++) {
-      const publisher = publishers[i];
-      const publisherBooks = [];
-      for (let j = 0; j < books.length; j++) {
-        const book = books[j];
-        if (String(book.publisher_id) === String(publisher._id)) {
-          publisherBooks.push(book._id);
-        }
-      }
-      publisher.book_ids = publisherBooks;
-      await publisher.save();
-      console.log("Successfully seeded data");
-    }
+    // for (let i = 0; i < publishers.length; i++) {
+    //   const publisher = publishers[i];
+    //   const publisherBooks = [];
+    //   for (let j = 0; j < books.length; j++) {
+    //     const book = books[j];
+    //     if (String(book.publisher_id) === String(publisher._id)) {
+    //       publisherBooks.push(book._id);
+    //     }
+    //   }
+    //   publisher.book_ids = publisherBooks;
+    //   await publisher.save();
+    // }
 
     // using MAP
-    // await Promise.all(
-    //   publishers.map(async (publisher) => {
-    //     const publisherBooks = await Promise.all(
-    //       books
-    //         .filter(
-    //           (book) => String(book.publisher_id) === String(publisher._id)
-    //         )
-    //         .map(async (_id) => {
-    //           return _id;
-    //         })
-    //     );
-    //     publisher.book_ids = publisherBooks;
-    //     await publisher.save();
-    //     console.log("Successfully seeded data");
-    //   })
-    // );
+    await Promise.all(
+      publishers.map(async (publisher) => {
+        const publisherBooks = await Promise.all(
+          books
+            .filter(
+              (book) => String(book.publisher_id) === String(publisher._id)
+            )
+            .map(async (_id) => {
+              return _id;
+            })
+        );
+        publisher.book_ids = publisherBooks;
+        await publisher.save();
+      })
+    );
+
+    console.log("Successfully seeded data");
   } catch (err) {
     console.error("Error seeding data:", err);
   }

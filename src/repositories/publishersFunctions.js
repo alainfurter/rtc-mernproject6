@@ -29,7 +29,7 @@ const deletePublisherDB = async (id) => {
 
 const getAllBooksForPublisherWithIdDB = async (id) => {
   const publisherWithBooks = await Publisher.findOne({ _id: id }).populate({
-    path: "books",
+    path: "book_ids",
     model: "Book",
     select: {
       _id: true,
@@ -42,10 +42,24 @@ const getAllBooksForPublisherWithIdDB = async (id) => {
   return publisherWithBooks;
 };
 
+const addBookIDToPublisherWithIdDB = async (id, payload) => {
+  const book_id = payload.book_id;
+  const updatedPublisher = await Publisher.findByIdAndUpdate(
+    id,
+    { $push: { book_ids: book_id } },
+    {
+      new: true,
+    }
+  );
+  return updatedPublisher;
+};
+
 module.exports = {
   getAllPublishersDB,
   getPublisherByIdDB,
   createPublisherDB,
   updatePublisherDB,
   deletePublisherDB,
+  getAllBooksForPublisherWithIdDB,
+  addBookIDToPublisherWithIdDB,
 };

@@ -29,7 +29,7 @@ const deleteBookDB = async (id) => {
 
 const getBookWithPublisherForIdDB = async (id) => {
   const bookWithPublisher = await Book.findOne({ _id: id }).populate({
-    path: "publisher",
+    path: "publisher_id",
     model: "Publisher",
     select: {
       _id: true,
@@ -39,6 +39,13 @@ const getBookWithPublisherForIdDB = async (id) => {
   return bookWithPublisher;
 };
 
+const addPublisherIDToBookWithIdDB = async (id, payload) => {
+  const updatedBook = await Book.findByIdAndUpdate(id, payload, {
+    new: true,
+  });
+  return updatedBook;
+};
+
 module.exports = {
   getAllBooksDB,
   getBookByIdDB,
@@ -46,4 +53,5 @@ module.exports = {
   updateBookDB,
   deleteBookDB,
   getBookWithPublisherForIdDB,
+  addPublisherIDToBookWithIdDB,
 };
